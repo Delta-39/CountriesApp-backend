@@ -3,11 +3,17 @@ const { Sequelize } = require("sequelize");
 
 const fs = require('fs');
 const path = require('path');
-const { DB_USER, DB_PASSWORD, DB_HOST } = process.env;
+const { DB_URL, DB_SSL_ENABLED, DB_SSL_REJECT_UNAUTHORIZED } = process.env;
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/countries`, {
-  logging: false, 
-  native: false, 
+const sequelize = new Sequelize(DB_URL, {
+  logging: false,
+  native: false,
+  dialectOptions: {
+    ssl: {
+      require: DB_SSL_ENABLED === "true", // Control SSL requirement based on environment variable
+      rejectUnauthorized: DB_SSL_REJECT_UNAUTHORIZED === "true", // Control SSL rejection based on environment variable
+    },
+  },
 });
 const basename = path.basename(__filename);
 
